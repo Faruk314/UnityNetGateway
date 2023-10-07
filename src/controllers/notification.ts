@@ -7,12 +7,11 @@ const createNotification = asyncHandler(async (req: Request, res: Response) => {
   const senderId = req.user?.id;
   const receiverId = req.params.receiverId;
   const postId = req.params.postId;
-
   const { type } = req.body;
 
   let q =
     "INSERT INTO notifications (`sender_id`, `receiver_id`, `type`, `post_id`) VALUES (?, ?, ?, ?)";
-  let data = await query(q, [senderId, receiverId, type, postId || null]);
+  let data = await query(q, [senderId, receiverId, type, postId]);
 
   if (!data.affectedRows) {
     res.status(500);

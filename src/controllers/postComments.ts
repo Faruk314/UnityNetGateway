@@ -4,7 +4,7 @@ import query from "../db";
 
 const isCommentLiked = asyncHandler(async (req: Request, res: Response) => {
   const commentId = req.params.id;
-  const userId = 1;
+  const userId = req.user?.id;
   let q =
     "SELECT `id` FROM comment_likes WHERE `comment_id` = ? AND `user_id` = ?";
   let data = await query(q, [commentId, userId]);
@@ -59,11 +59,10 @@ const commentPost = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const deletePostComment = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.user?.id;
   const commentId = req.params.id;
 
-  let q = "DELETE FROM comments WHERE `user_id` = ? AND `id` = ?";
-  const values = [userId, commentId];
+  let q = "DELETE FROM comments WHERE `id` = ?";
+  const values = [commentId];
 
   let data = await query(q, values);
 

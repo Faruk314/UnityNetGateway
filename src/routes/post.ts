@@ -25,7 +25,7 @@ router.post("/createPost", protect, createPost);
 
 router.post("/addPhoto", protect, upload.single("photo"), addPhoto);
 
-router.get("/getPosts/:page", protect, getPosts);
+router.get("/getPosts", protect, getPosts);
 
 router.get("/getSharesCount/:id", getSharesCount);
 
@@ -35,7 +35,7 @@ router.get("/getPostLikesCount/:id", protect, getPostLikesCount);
 
 router.get("/getPost/:id", getPost);
 
-router.get("/getUserPosts/:id/:page", protect, getUserPosts);
+router.get("/getUserPosts/:id", protect, getUserPosts);
 
 router.get("/isPostLiked/:id", protect, isPostLiked);
 

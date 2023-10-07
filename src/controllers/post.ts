@@ -4,7 +4,6 @@ import query from "../db";
 import { minioClient } from "../app";
 import shortUUID from "short-uuid";
 import sharp from "sharp";
-import mime from "mime";
 
 const getSharesCount = asyncHandler(async (req: Request, res: Response) => {
   const postId = req.params.id;
@@ -58,8 +57,6 @@ const isPostLiked = asyncHandler(async (req: Request, res: Response) => {
 
 const getUserPosts = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.params.id;
-  const page = parseInt(req.params.page);
-  const offset = (page - 1) * 10;
 
   let q = `
   SELECT p.id, p.user_id, p.text_content, p.type, p.photo, p.created_at, p.updated_at, p.edited,p.profile_id, u.first_name, u.last_name, u.image 
@@ -67,7 +64,7 @@ const getUserPosts = asyncHandler(async (req: Request, res: Response) => {
   INNER JOIN users u ON p.user_id = u.id 
   WHERE (p.profile_id = ? AND p.user_id != p.profile_id) OR (p.user_id = ? AND p.profile_id IS NULL) OR (p.profile_id = ? AND p.profile_id=p.user_id)
   ORDER BY p.created_at DESC 
-  LIMIT 10 OFFSET ${offset}
+ 
   `;
 
   let data = await query(q, [userId, userId, userId]);
@@ -139,8 +136,6 @@ const createPost = asyncHandler(async (req: Request, res: Response) => {
 
 const getPosts = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?.id;
-  const page = req.params.page;
-  const offset = (+page - 1) * 10;
 
   //send posts that user and his friends own
   let q = `SELECT DISTINCT p.id, p.user_id, p.text_content, p.photo, p.type, p.created_at, p.updated_at,p.edited,p.profile_id, u.first_name, u.last_name, u.image
@@ -150,9 +145,9 @@ const getPosts = asyncHandler(async (req: Request, res: Response) => {
   WHERE (u.id = ? AND p.profile_id IS NULL)
   OR (f.personA = ? AND p.profile_id IS NULL) OR (f.personB = ? AND p.profile_id IS NULL)
   ORDER BY p.created_at DESC
-  LIMIT 10 OFFSET ?`;
+  `;
 
-  let data = await query(q, [userId, userId, userId, offset + ""]);
+  let data = await query(q, [userId, userId, userId]);
 
   data.forEach((post: any) => {
     if (post.photo) {
@@ -195,8 +190,6 @@ const deletePost = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?.id;
   const type = req.body.type;
   let bucketName = "social-media";
-
-  console.log(postId);
 
   let q;
   let data;

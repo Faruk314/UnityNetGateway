@@ -56,10 +56,23 @@ const acceptFriendRequest = asyncHandler(
   async (req: Request, res: Response) => {
     const receiver = req.user?.id;
     const sender = req.params.id;
-    let q = "DELETE FROM friend_requests WHERE `receiver`= ? AND `sender`=?";
-    let values = [receiver, sender];
+
+    let q =
+      "SELECT `id` FROM friend_requests WHERE (`receiver` = ? OR `sender` = ?) AND (`receiver` = ? OR `sender` = ?)";
+
+    let values = [receiver, receiver, sender, sender];
 
     let data = await query(q, values);
+
+    if (data.length === 0) {
+      res.status(400);
+      throw new Error("Friend request does not exist");
+    }
+
+    q = "DELETE FROM friend_requests WHERE `receiver`= ? AND `sender`=?";
+    values = [receiver, sender];
+
+    data = await query(q, values);
 
     if (!data.affectedRows) {
       res.status(500);
@@ -112,9 +125,12 @@ const checkFriendsStatus = asyncHandler(async (req: Request, res: Response) => {
   const values = [loggedUserId, loggedUserId, secondUser, secondUser];
   let data = await query(q, values);
 
-  if (data.length) {
+  if (data.length > 0) {
+    res.status(200);
     res.json(true);
+    return;
   } else {
+    res.status(404);
     res.json(false);
   }
 });

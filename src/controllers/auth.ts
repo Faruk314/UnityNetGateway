@@ -63,8 +63,8 @@ const login = asyncHandler(async (req: Request, res: Response) => {
 
   res
     .cookie("access_token", token, {
-      httpOnly: true,
-      sameSite: "none",
+      httpOnly: false,
+      sameSite: "strict",
       secure: true,
     })
     .status(200)
@@ -74,8 +74,8 @@ const login = asyncHandler(async (req: Request, res: Response) => {
 const logout = asyncHandler(async (req: Request, res: Response) => {
   res
     .clearCookie("access_token", {
-      httpOnly: true,
-      sameSite: "none",
+      httpOnly: false,
+      sameSite: "strict",
       secure: true,
     })
     .status(200)

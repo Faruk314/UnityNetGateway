@@ -23,7 +23,7 @@ router.delete("/rejectFriendRequest/:senderId", protect, rejectFriendRequest);
 
 router.get("/checkFriendRequestStatus/:id", protect, checkFriendRequestStatus);
 
-router.get("/sendFriendRequest/:id", protect, sendFriendRequest);
+router.post("/sendFriendRequest/:id", protect, sendFriendRequest);
 
 router.get("/acceptFriendRequest/:id", protect, acceptFriendRequest);
 
